@@ -6,11 +6,21 @@ const initialState = {
 const hobbyReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'ADD_HOBBY': {
-      return state;
+      // Mỗi lần muốn thay đổi state liên quan tới obj/array phải clone ra một obj mới để tránh trường hợp bị tham chiếu
+      const newList = [...state.list];
+      newList.push(action.payload);
+
+      return {
+        ...state,
+        list: newList,
+      };
     }
 
     case 'SET_ACTIVE_HOBBY': {
-      return state;
+      return {
+        ...state,
+        activeId: action.payload.id,
+      };
     }
 
     default:
