@@ -1,70 +1,91 @@
-# Getting Started with Create React App
+# Các bước setup Redux trong ReactJS
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+1. Cài đặt package react-redux và redux
 
-## Available Scripts
+```
+yarn add redux react-redux
+```
 
-In the project directory, you can run:
+2. Setup reducers và rootReducer
 
-### `yarn start`
+```
+// reducers/hobbyReducer.js
+const initialState = {
+ list: ['Listening to music'],
+ selectedId: null,
+}
+const hobbyReducer = (state = initialState, action) => {
+ switch (action.type) {
+    case 'ADD_HOBBY': {
+        const newList = [...state.list];
+        newList.push(action.payload);
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+        return {
+            ...state,
+            list: newList,
+        }
+    }
+    default:
+        return state;
+ }
+};
+export default hobbyReducer;
+```
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+```
+// reducers/rootReducer.js (ROOT)
+const rootReducer = combineReducers({
+ hobby: hobbyReducer,
+ // chẳng hạn có nhiều reducer khác nữa
+ one: oneReducer
+ two: twoReducer
+})
+export default rootReducer;
+```
 
-### `yarn test`
+3. Setup redux store
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```
+// src/store.js
+const store = createStore(rootReducer);
+export default store;
+```
 
-### `yarn build`
+4. Setup redux provider cho toàn app: src/index.js
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
+ReactDOM.render(
+    <Provider store={store}>
+        <App />
+    </Provider>,
+    document.getElementById('root')
+);
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+5. Connect vào redux strore từ component
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- Với class component: dùng HOC connect()
+- Với functional component: dùng hooks useSelector() và useDispatch()
 
-### `yarn eject`
+```
+function HomePage(props) {
+    const hobbyList = useSelector(state => state.hobby.list);
+    const dispatch = useDispatch();
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+    const handleAddHobbyClick = () => {
+        const newHobby = 'Coding';
+        dispatch({
+            type: 'ADD_HOBBY',
+            payload: newHobby,
+        });
+    }
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+    return (
+        <div className="home-page">
+            <HobbyList data={hobbyList} />
+            <button onClick={handleAddHobbyClick}>Add new hobby</button>
+        </div>
+    );
+}
+export default HomePage;
+```
