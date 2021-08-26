@@ -6,7 +6,9 @@
 yarn add redux react-redux
 ```
 
-2. Setup reducers và rootReducer
+2. Setup reducers, rootReducer và action creator
+
+- reducer:
 
 ```
 // reducers/hobbyReducer.js
@@ -32,6 +34,8 @@ const hobbyReducer = (state = initialState, action) => {
 export default hobbyReducer;
 ```
 
+- rootReducer:
+
 ```
 // reducers/rootReducer.js (ROOT)
 const rootReducer = combineReducers({
@@ -41,6 +45,25 @@ const rootReducer = combineReducers({
  two: twoReducer
 })
 export default rootReducer;
+```
+
+- actions:
+
+```
+// actions/hobbyAction.js
+export const addNewHobbyAction = (hobby) => {
+  return {
+    type: 'ADD_HOBBY',
+    payload: hobby,
+  };
+};
+
+export const setActiveHobbyAction = (hobby) => {
+  return {
+    type: 'SET_ACTIVE_HOBBY',
+    payload: hobby,
+  };
+};
 ```
 
 3. Setup redux store
